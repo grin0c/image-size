@@ -85,21 +85,10 @@ describe('Valid images', function () {
 
     describe(file, function() {
 
-      var type, bufferDimensions, asyncDimensions;
-      var bufferSize = 8192;
+      var asyncDimensions;
+      var bufferSize = 0x4000;
 
       beforeEach(function (done) {
-
-        var buffer = new Buffer(bufferSize);
-        var filepath = path.resolve(file);
-        var descriptor = fs.openSync(filepath, 'r');
-        fs.readSync(descriptor, buffer, 0, bufferSize, 0);
-        type = detector(buffer);
-
-        // tiff cannot support buffers, unless the buffer contains the entire file
-        if (type !== 'tiff') {
-          bufferDimensions = imageSize(buffer);
-        }
 
         imageSize(file, function (err, _dim) {
           asyncDimensions = _dim;
@@ -117,18 +106,6 @@ describe('Valid images', function () {
             expect(item.width).to.be(expectedItem.width);
             expect(item.height).to.be(expectedItem.height);
           });
-        }
-
-        if (type !== 'tiff') {
-          expect(bufferDimensions.width).to.be(expected.width);
-          expect(bufferDimensions.height).to.be(expected.height);
-          if (bufferDimensions.images) {
-            bufferDimensions.images.forEach(function (item, index) {
-              var expectedItem = expected.images[index];
-              expect(item.width).to.be(expectedItem.width);
-              expect(item.height).to.be(expectedItem.height);
-            });
-          }
         }
       });
     });
